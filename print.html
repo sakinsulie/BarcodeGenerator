@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Print Daily QR</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script src="schedule.js"></script>
+<style>
+  :root{--ink:#18232c;--muted:#5d6a74;--line:#d4dbe0;--accent:#0f6b6e;--bg:#f3f5f6}
+  *{box-sizing:border-box}
+  body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);margin:0;padding:24px 16px 48px}
+  .wrap{max-width:900px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,300px);gap:24px;align-items:start}
+  @media (max-width:760px){.wrap{grid-template-columns:minmax(0,1fr)}}
+  h1{font-size:1.5rem;margin:0 0 4px}
+  .muted{color:var(--muted);font-size:.9rem;margin:0}
+  .controls{display:grid;gap:14px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:18px}
+  label{display:grid;gap:4px;font-size:.8rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+  input,select{font:inherit;font-size:.95rem;padding:8px 10px;border:1px solid var(--line);border-radius:6px;width:100%;text-transform:none;letter-spacing:0;font-weight:400;color:var(--ink)}
+  button{font:inherit;font-weight:600;padding:10px 14px;border-radius:6px;border:0;background:var(--accent);color:#fff;cursor:pointer}
+  .sheet{background:#fff;border:1px solid var(--line);border-radius:10px;padding:32px 24px;display:grid;justify-items:center;gap:14px;text-align:center}
+  .sheet h2{margin:0;font-size:1.6rem;text-wrap:balance}
+  .sheet .qr svg{display:block;width:var(--size,3in);height:var(--size,3in);max-width:100%}
+  .sheet .sub{margin:0;color:#333;font-size:1rem}
+  .sheet .url{margin:0;font-family:ui-monospace,Menlo,monospace;font-size:.75rem;color:#666;word-break:break-all}
+  .today{font-size:.85rem;background:#e3f0f0;border-radius:6px;padding:10px 12px;word-break:break-all}
+  @media print{
+    body{background:#fff;padding:0}
+    .controls,.head{display:none!important}
+    .wrap{display:block}
+    .sheet{border:0;padding:0.5in 0}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="sheet" id="sheet">
+    <h2 id="pTitle"></h2>
+    <div class="qr" id="qr"></div>
+    <p class="sub" id="pSub"></p>
+    <p class="url" id="pUrl"></p>
+  </div>
+
+  <div class="controls">
+    <div class="head">
+      <h1>Print your QR code</h1>
+      <p class="muted">This code never changes. It always opens this site, which sends people to that day's link.</p>
+    </div>
+    <label>Heading <input id="title" value="Scan for today's link"></label>
+    <label>Line under the code <input id="sub" value="Updated every day"></label>
+    <label>Code size
+      <select id="size">
+        <option value="1.5in">1.5 in (sticker)</option>
+        <option value="2.5in">2.5 in</option>
+        <option value="3.5in" selected>3.5 in (half page)</option>
+        <option value="6in">6 in (poster)</option>
+      </select>
+    </label>
+    <label><span><input type="checkbox" id="showUrl" checked style="width:auto"> Print the web address</span></label>
+    <button id="print" type="button">Print</button>
+    <div class="today" id="today"></div>
+  </div>
+</div>
+<script>
+(function () {
+  // The code points at this site's home page (where index.html lives).
+  var target = location.href.split(/[?#]/)[0].replace(/print\.html$/, "");
+  var $ = function (id) { return document.getElementById(id); };
+
+  function draw() {
+    var qr = qrcode(0, "H"); qr.addData(target); qr.make();
+    $("qr").innerHTML = qr.createSvgTag({cellSize: 8, margin: 4, scalable: true});
+    $("sheet").style.setProperty("--size", $("size").value);
+    $("pTitle").textContent = $("title").value;
+    $("pSub").textContent = $("sub").value;
+    $("pUrl").textContent = target; $("pUrl").hidden = !$("showUrl").checked;
+  }
+  ["title","sub","size","showUrl"].forEach(function (id) { $(id).addEventListener("input", draw); $(id).addEventListener("change", draw); });
+  $("print").onclick = function () { window.print(); };
+  draw();
+
+  var t = $("today");
+  t.innerHTML = 'Check what scans open: <a href="' + target + '?date=' + new Intl.DateTimeFormat("en-CA",{timeZone:(window.DAILY_QR||{}).TIMEZONE}).format(new Date()) + '">today</a>. Add <code>?date=YYYY-MM-DD</code> to the address to check another day.';
+})();
+</script>
+</body>
+</html>

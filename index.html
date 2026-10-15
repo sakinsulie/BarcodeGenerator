@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<meta http-equiv="Cache-Control" content="no-cache">
+<title>Redirecting…</title>
+<style>
+  body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#f3f5f6;color:#18232c;margin:0;padding:48px 16px;text-align:center}
+  a{color:#0f6b6e;word-break:break-all}
+  p{max-width:36rem;margin:0 auto 12px}
+</style>
+<script src="schedule.js"></script>
+</head>
+<body>
+<p id="msg">Opening today's link…</p>
+<p><a id="link" href="#" hidden></a></p>
+<noscript><p>Please enable JavaScript to open today's link.</p></noscript>
+<script>
+(function () {
+  var S = window.DAILY_QR || {};
+  var NAMES = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+
+  // Today's calendar date in the configured time zone, as Y/M/D numbers.
+  function todayParts(tz) {
+    var f = new Intl.DateTimeFormat("en-CA", {timeZone: tz || undefined, year:"numeric", month:"2-digit", day:"2-digit"});
+    var p = {}; f.formatToParts(new Date()).forEach(function (x) { p[x.type] = x.value; });
+    return {y: +p.year, m: +p.month, d: +p.day};
+  }
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+
+  // ?date=YYYY-MM-DD lets you test what a future day will open.
+  var q = new URLSearchParams(location.search).get("date");
+  var t = (q && /^\d{4}-\d{2}-\d{2}$/.test(q))
+    ? {y: +q.slice(0,4), m: +q.slice(5,7), d: +q.slice(8,10)}
+    : todayParts(S.TIMEZONE);
+
+  var iso = t.y + "-" + pad(t.m) + "-" + pad(t.d);
+  var dayNum = Date.UTC(t.y, t.m - 1, t.d) / 864e5;
+  var weekday = NAMES[new Date(Date.UTC(t.y, t.m - 1, t.d)).getUTCDay()];
+
+  function fill(u) {
+    return String(u).replace(/\{date\}/g, iso).replace(/\{yyyy\}/g, t.y)
+      .replace(/\{mm\}/g, pad(t.m)).replace(/\{dd\}/g, pad(t.d)).replace(/\{weekday\}/g, weekday);
+  }
+
+  var url = (S.DATES || {})[iso] || (S.WEEKDAYS || {})[weekday];
+  var list = (S.ROTATION || []).filter(Boolean);
+  if (!url && list.length) {
+    var s = (S.ROTATION_START || iso).split("-").map(Number);
+    var diff = dayNum - Date.UTC(s[0], s[1] - 1, s[2]) / 864e5;
+    url = list[((diff % list.length) + list.length) % list.length];
+  }
+  url = url || S.FALLBACK;
+
+  var a = document.getElementById("link");
+  if (!url) { document.getElementById("msg").textContent = "No link is scheduled for today."; return; }
+  url = fill(url);
+  a.href = url; a.textContent = url; a.hidden = false;
+  document.getElementById("msg").textContent = q ? ("Link for " + weekday + " " + iso + ":") : "Opening today's link… If nothing happens, tap:";
+  if (!q) location.replace(url);
+})();
+</script>
+</body>
+</html>
