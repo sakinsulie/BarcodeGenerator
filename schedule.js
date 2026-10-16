@@ -36,7 +36,7 @@ window.DAILY_QR = {
 
   // 3. Rotating list — link 1 shows on ROTATION_START,
   //    link 2 the next day, and so on, then starts over.
-  ROTATION_START: "2026-10-15",
+  ROTATION_START: "2026-10-18",
   ROTATION: [
     "https://drive.google.com/file/d/1GeKJprEDhKs0uJ3Mse2v0H4SHKy1NiVc/view?usp=sharing",
     "https://drive.google.com/file/d/1O7Kwd1UtEOsEYyh_1NdIRmttRJd0bYEn/view?usp=sharing",
