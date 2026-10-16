@@ -38,9 +38,12 @@ window.DAILY_QR = {
   //    link 2 the next day, and so on, then starts over.
   ROTATION_START: "2026-10-15",
   ROTATION: [
-    "https://example.com/link-1",
-    "https://example.com/link-2",
-    "https://example.com/link-3",
+    "https://drive.google.com/file/d/1GeKJprEDhKs0uJ3Mse2v0H4SHKy1NiVc/view?usp=sharing",
+    "https://drive.google.com/file/d/1O7Kwd1UtEOsEYyh_1NdIRmttRJd0bYEn/view?usp=sharing",
+    "https://drive.google.com/file/d/1l7P9PpdJ1chQtbbXEfNCBZ5KzttihYyF/view?usp=sharing",
+    "https://drive.google.com/file/d/1Q2hwCeiJXn0aZq-BQQwpwsIsX7hxyngD/view?usp=sharing",
+    "https://drive.google.com/file/d/178BtKffBEimcH16zCrzuzDWULPrntLOz/view?usp=sharing",
+    "https://drive.google.com/file/d/1Xoqu4tzSSVPBqy_wWGnbsFyqKlZBFHdc/view?usp=sharing",
   ],
 
   // 4. Fallback
